@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <button onclick="play()">Play</button>
+    <button onclick="pause()">Pause</button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.3/howler.min.js"></script>
+    <script>
+      let data = null;
+      let back = new Howl({
+        src: ["./assets/test2.mp3"],
+        html5: true,
+        pool: 0
+      });
+
+      let song = null;
+      function play() {
+        if (!data) {
+          console.log("Create");
+          song = data = new Howl({
+            src: ["./assets/test1.mp3"],
+            html5: true,
+            pool: 3
+          });
+        }
+        song = data.play();
+      }
+      function pause() {
+        if (song) {
+          song.pause();
+        }
+      }
+    </script>
+  </body>
+</html>
