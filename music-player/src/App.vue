@@ -1,9 +1,8 @@
 <template>
   <div id="app">
-    <button @click="addProgress">Increase Progress</button>
-    <p>Progress: {{musicProgress}}%</p>
     <br />
-    <progress-bar width="40rem" height="10px" :progress="musicProgress" @jump="onProgressJump" />
+    <p>Progress: {{musicProgress}}%</p>
+    <progress-bar width="40rem" height="10px" :progress="progress" @jump="seek" />
     <volume-control
       width="10rem"
       height="7px"
@@ -13,6 +12,7 @@
     />
     <br />
     <p>Volume: {{volume}}</p>
+    <p>Duration: {{formattedPlayed}}/{{formattedDuration}}</p>
     <br />
 
     <button @click="play">Play</button>
@@ -28,6 +28,8 @@
 <script>
 import ProgressBar from "./components/ProgressBar.vue";
 import VolumeControl from "./components/VolumeControl.vue";
+import Player from "./lib/Player.js";
+import SongList from "./lib/SongList.json";
 
 export default {
   name: "App",
@@ -38,42 +40,69 @@ export default {
   data: function() {
     return {
       volume: 10,
-      currentSong: 0 // soundId
+      player: new Player(SongList),
+      duration: 0,
+      progress: 20
     };
   },
   methods: {
-    onProgressJump: function(clickPercent) {
-      this.mutations.setProgress(clickPercent);
-    },
-    addProgress: function() {
-      this.mutations.addProgress(10);
+    seek: function(clickPercent) {
+      console.log("Seeked");
+      this.progress = clickPercent;
+      this.player.seek(clickPercent);
+      this.step();
     },
     onChangeVolume: function(newValue) {
       this.volume = newValue;
+      this.player.volume(newValue / 100);
     },
     play() {
-      console.log("Playing");
-      console.log(this.store.player._list[0]._source);
-      console.log(__dirname);
-      this.store.player.play();
+      this.player.bindEvent(this.onPlay.bind(this), this.onSeek.bind(this));
+      this.player.play();
     },
     pause() {
-      this.store.player.pause();
+      this.player.pause();
     },
-    skip(forward) {}
+    skip(forward) {
+      this.player.skip(forward === 1);
+    },
+    step() {
+      console.log("Step");
+      const isPlaying = this.player.isPlaying();
+      this.progress = this.player.progress();
+      // console.log(`Currently Playing: ${this.getSong()._source}`);
+      if (isPlaying) requestAnimationFrame(this.step.bind(this));
+    },
+    onPlay() {
+      console.log("On Play Triggered");
+      this.duration = this.player.duration();
+      this.player.volume(this.volume / 100);
+      this.step();
+    },
+    onSeek() {
+      this.progress = this.player.progress();
+      this.step();
+    }
   },
   computed: {
     musicProgress() {
-      return this.store.progress;
+      return this.progress;
     },
-    totalTime() {
-      const total = this.currentSong.duration();
+    formattedDuration() {
+      const total = this.duration;
       const minute = Math.floor(total / 60);
-      const second = total - minute * 60;
-      return `${minute}:${second}`;
+      const second = Math.round(total - minute * 60);
+      return `${minute < 10 ? 0 : ""}${minute}:${
+        second < 10 ? 0 : ""
+      }${second}`;
     },
-    isPlaying() {
-      return this.currentSong.playing();
+    formattedPlayed() {
+      const total = (this.musicProgress / 100) * this.duration;
+      const minute = Math.floor(total / 60);
+      const second = Math.round(total - minute * 60);
+      return `${minute < 10 ? 0 : ""}${minute}:${
+        second < 10 ? 0 : ""
+      }${second}`;
     }
   }
 };

@@ -16,7 +16,7 @@ module.exports = {
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
     semi: ["error", "always", { omitLastInOneLineBlock: false }],
     quotes: ["error", "double"],
-    "space-before-function-paren": ["error", {
+    "space-before-function-paren": [1, {
       "anonymous": "never",
       "named": "never",
       "asyncArrow": "always"
