@@ -22,5 +22,7 @@ module.exports = {
       "asyncArrow": "always"
     }],
     //"prefer-destructuring": ["error", { "object": false, "array": false }]
+    "lines-between-class-members": [0],
+    "no-unneded-ternary": 0
   }
 };

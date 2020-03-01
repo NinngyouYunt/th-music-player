@@ -13,13 +13,21 @@
     />
     <br />
     <p>Volume: {{volume}}</p>
+    <br />
+
+    <button @click="play">Play</button>
+
+    <button @click="pause">Pause</button>
+
+    <button @click="skip(-1)">Prev</button>
+
+    <button @click="skip(1)">Next</button>
   </div>
 </template>
 
 <script>
 import ProgressBar from "./components/ProgressBar.vue";
 import VolumeControl from "./components/VolumeControl.vue";
-import { songList } from 
 
 export default {
   name: "App",
@@ -42,7 +50,17 @@ export default {
     },
     onChangeVolume: function(newValue) {
       this.volume = newValue;
-    }
+    },
+    play() {
+      console.log("Playing");
+      console.log(this.store.player._list[0]._source);
+      console.log(__dirname);
+      this.store.player.play();
+    },
+    pause() {
+      this.store.player.pause();
+    },
+    skip(forward) {}
   },
   computed: {
     musicProgress() {

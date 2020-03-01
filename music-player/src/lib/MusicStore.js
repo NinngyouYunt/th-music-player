@@ -1,7 +1,10 @@
 import Vue from "vue";
+import Player from "./List.js";
+import SongList from "./SongList.json";
 
 export const MusicStore = Vue.observable({
-  progress: 50
+  progress: 50,
+  player: new Player(SongList)
 });
 
 export const Mutations = {

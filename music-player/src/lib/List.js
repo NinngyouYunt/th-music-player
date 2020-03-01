@@ -1,14 +1,6 @@
+import { Howl, Howler } from "howler";
 
-export const songList = [
-  {
-    album: "_ungroup",
-    list: [
-      { _title: "Test.mp3", _album: "unknown", _source: "./test.mp3", _instance: null }
-    ]
-  }
-];
-
-class Player {
+export default class Player {
   constructor(list) {
     this._list = list;
     this._index = 0;
@@ -18,31 +10,37 @@ class Player {
    * @param {Number} index Index of song in the list (optional)
    */
   play(index) {
+    console.log("Start Playing");
     index = index ? index : this._index;
 
-    let data = this.getSong(index);
+    const data = this.getSong(index);
     if (!data._instance) {
       data._instance = new Howl({
         src: [data._source],
         html5: true,
         pool: 0
       });
+      console.log("Create Instance");
     }
     data._instance.play();
     this._index = index;
   }
+
   pause() {
     const instance = this.getSong()._instance;
     if (instance) instance.pause();
   }
+
   volume(volume) {
     Howler.volume(volume);
   }
+
   skipTo(index) {
-    let instance = this.getSong()._instance;
+    const instance = this.getSong()._instance;
     if (instance) instance.stop();
     this.play(index);
   }
+
   skip(forward) {
     let index;
     if (forward) {
@@ -58,16 +56,12 @@ class Player {
   getCurrentSong() {
     return this._currentSong;
   }
+
   getSong(index) {
     if (!index) index = this._index;
     return this._list[index];
   }
 };
-
-const list = [
-  { _title: "Test1.mp3", _album: "unknown", _source: "./test1.mp3", _instance: null },
-  { _title: "Test2.mp3", _album: "unknown", _source: "./test2.mp3", _instance: null }
-];
 
 export class Song {
   _title;
