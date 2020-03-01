@@ -96,3 +96,5 @@ typings/
 
 # application config file
 config.json
+
+package-lock.json
