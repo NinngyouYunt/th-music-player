@@ -5,22 +5,32 @@ export default class Player {
     this._list = list;
     this._index = 0;
   }
+  bindEvent(onPlay, onSeek) {
+    this._onPlay = onPlay;
+    this._onSeek = onSeek;
+  }
   /**
    * Play a song or resume play a song
    * @param {Number} index Index of song in the list (optional)
    */
   play(index) {
-    console.log("Start Playing");
-    index = index ? index : this._index;
+    index = index || this._index;
 
     const data = this.getSong(index);
     if (!data._instance) {
+      console.log(`Loading ${data._source}`);
       data._instance = new Howl({
         src: [data._source],
         html5: true,
-        pool: 0
+        format: ["mp3"],
+        pool: 0,
+        onplay: () => {
+          this._onPlay();
+        },
+        onseek: () => {
+          this._onSeek();
+        }
       });
-      console.log("Create Instance");
     }
     data._instance.play();
     this._index = index;
@@ -32,6 +42,7 @@ export default class Player {
   }
 
   volume(volume) {
+    console.log(`Volume set to ${volume}`);
     Howler.volume(volume);
   }
 
@@ -52,6 +63,18 @@ export default class Player {
     }
     this.skipTo(index);
   }
+  seek(percent) {
+    const instance = this.getSong()._instance;
+    if (instance) {
+      instance.seek(percent / 100 * instance.duration());
+    }
+  }
+  progress() {
+    const instance = this.getSong()._instance;
+    if (instance) {
+      return (instance.seek() / instance.duration() * 100);
+    }
+  }
   // Getter
   getCurrentSong() {
     return this._currentSong;
@@ -60,6 +83,21 @@ export default class Player {
   getSong(index) {
     if (!index) index = this._index;
     return this._list[index];
+  }
+
+  isPlaying() {
+    const instance = this.getSong()._instance;
+    if (instance) {
+      return instance.playing();
+    }
+    return false;
+  }
+  duration() {
+    const instance = this.getSong()._instance;
+    if (instance) {
+      return instance.duration();
+    }
+    return 0;
   }
 };
 
