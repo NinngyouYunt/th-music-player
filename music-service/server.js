@@ -1,90 +1,42 @@
-#!/usr/bin/env node
+const errorHandler = require("errorhandler");
 
-/**
- * Module dependencies.
- */
+const app = require("./app");
 
-var app = require('./app');
-var debug = require('debug')('th-music-service:server');
-var http = require('http');
-
-/**
- * Get port from environment and store in Express.
- */
-
-var port = normalizePort(process.env.PORT || '4000');
-app.set('port', port);
-
-/**
- * Create HTTP server.
- */
-
-var server = http.createServer(app);
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
-
-/**
- * Normalize a port into a number, string, or false.
- */
-
-function normalizePort(val) {
-  var port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    // named pipe
-    return val;
+// Customize Error Handler - This is where you could put local log file for any errors that happen
+app.use(function (err, req, res, next) {
+  const requestInfo = {
+    url: req.protocol + '://' + req.get('host') + req.originalUrl,
+    method: req.method
+  };
+  // Deal with 404 error
+  if (err.status == 404) {
+    res.status(err.status)
+      .send(`${requestInfo.method}: ${requestInfo.url} returns status code ${err.status} with content: ${err.message}`);
+    return;
   }
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
 
-  return false;
+  // Deal with other error
+  // Pass error down to print stacks
+  next(err);
+
+  // Or we can send result and log the stack in other way
+  // res.status(500);
+  // res.send(`Unexpected error: ${err}`);
+});
+
+// Print stack track for uncaught error (not necessary) - should not be run for production
+if (app.get("env") === "development") {
+  app.use(errorHandler());
 }
 
-/**
- * Event listener for HTTP server "error" event.
- */
+const server = app.listen(app.get("port"), () => {
+  console.log(
+    "  App is running at http://localhost:%d in %s mode",
+    app.get("port"),
+    app.get("env")
+  );
+  console.log("  Press CTRL-C to stop\n");
+});
 
-function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
-
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
-
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
-}
-
-/**
- * Event listener for HTTP server "listening" event.
- */
-
-function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
-}
+module.exports = server;
