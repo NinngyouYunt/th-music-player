@@ -14,18 +14,17 @@ export default class Player {
    * @param {Number} index Index of song in the list (optional)
    */
   play(index) {
-    index = index || this._index;
-
+    index = typeof index === "number" ? index : this._index;
     const data = this.getSong(index);
     if (!data._instance) {
-      console.log(`Loading ${data._source}`);
+      console.log(`Loading ${data.source}`);
       data._instance = new Howl({
-        src: [data._source],
+        src: [data.source],
         html5: true,
         format: ["mp3"],
         pool: 0,
         onplay: () => {
-          this._onPlay();
+          this._onPlay(data.title, data._instance.duration());
         },
         onseek: () => {
           this._onSeek();
@@ -46,8 +45,13 @@ export default class Player {
     Howler.volume(volume);
   }
 
+  mute(isMute) {
+    Howler.mute(isMute);
+  }
+
   skipTo(index) {
     const instance = this.getSong()._instance;
+    console.log(`Stop: ${this.getSong().title}`);
     if (instance) instance.stop();
     this.play(index);
   }
@@ -56,11 +60,13 @@ export default class Player {
     let index;
     if (forward) {
       index = this._index + 1;
-      if (index > this._list.length) index = 0;
+      if (index >= this._list.length) index = 0;
     } else {
       index = this._index - 1;
       if (index < 0) index = this._list.length - 1;
     }
+    console.log(index);
+    console.log(this._list);
     this.skipTo(index);
   }
   seek(percent) {
@@ -81,7 +87,7 @@ export default class Player {
   }
 
   getSong(index) {
-    if (!index) index = this._index;
+    if (typeof index !== "number") index = this._index;
     return this._list[index];
   }
 
@@ -102,8 +108,8 @@ export default class Player {
 };
 
 export class Song {
-  _title;
-  _album;
-  _source;
-  _instance;
+  title;
+  album;
+  source;
+  instance;
 };
