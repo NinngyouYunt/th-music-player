@@ -1,33 +1,60 @@
 const path = require("path");
 const fs = require("fs");
 const createError = require("http-errors");
+const MusicDal = require("../dal/MusicDal.js");
 
 class MusicController {
   constructor() {
     this.folderToFile = "../assets/";
+    this._dal = new MusicDal();
   }
+
   get(req, res, next) {
+    const hasMeta = req.query.hasOwnProperty("meta");
     const [albumId, songId] = [req.params["albumId"], req.params["songId"]];
-    const filePath = this.createFilePath(albumId, songId);
-    if (fs.existsSync(filePath)) {
-      console.log(`Sent file ${filePath}`);
-      res.sendFile(filePath);
+    if (hasMeta) {
+      res.send("You asked for meta");
+      return;
+    } else {
+      const filePath = this.createFilePath(albumId, songId);
+      if (fs.existsSync(filePath)) {
+        console.log(`Sent file ${filePath}`);
+        res.setHeader("Content-Type", "audio/mpeg");
+        res.sendFile(filePath);
+        return;
+      }
+      next(createError(500, `File ${filePath} not found`))
+    }
+  }
+
+  list(req, res, next) {
+    const dalResult = this._dal.getSongList();
+    if (dalResult.success) {
+      res.setHeader("Content-Type", "application/json");
+      res.status(200).send(dalResult.data);
+      return;
+    } else {
+      next(createError(500, `Failed to load song list ${dalResult.error}`))
       return;
     }
-    next(createError(500, `File ${filePath} not found`))
   }
+  //#region Helper
   createFilePath(albumId, songId) {
     albumId = this.prependZero(albumId);
     songId = this.prependZero(songId);
     const fileName = `th${albumId}_${songId}.mp3`;
     return path.join(__dirname, this.folderToFile, fileName);
   }
-  prependZero(number) {
-    if (number < 10) {
-      return `0${number}`;
+  prependZero(value) {
+    if (typeof value == "string") {
+      value = Number(value);
     }
-    return `${number}`;
+    if (value < 10) {
+      return `0${value}`;
+    }
+    return `${value}`;
   }
+  //#endregion HELPER
 }
 
 module.exports = MusicController;
