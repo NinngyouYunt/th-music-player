@@ -5,9 +5,10 @@ export default class Player {
     this._list = list;
     this._index = 0;
   }
-  bindEvent(onPlay, onSeek) {
+  bindEvent(onPlay, onSeek, onEnd) {
     this._onPlay = onPlay;
     this._onSeek = onSeek;
+    this._onEnd = onEnd;
   }
   /**
    * Play a song or resume play a song
@@ -16,43 +17,59 @@ export default class Player {
   play(index) {
     index = typeof index === "number" ? index : this._index;
     const data = this.getSong(index);
-    if (!data._instance) {
-      console.log(`Loading ${data.source}`);
-      data._instance = new Howl({
-        src: [data.source],
-        html5: true,
-        format: ["mp3"],
-        pool: 0,
-        onplay: () => {
-          this._onPlay(data.title, data._instance.duration());
-        },
-        onseek: () => {
-          this._onSeek();
-        }
-      });
+    if (data) {
+      if (!data._instance) {
+        this.log(`Loading ${data.source}`);
+        data._instance = new Howl({
+          src: [data.source],
+          html5: true,
+          format: ["mp3"],
+          pool: 0,
+          onplay: () => {
+            this._onPlay(data.title, data._duration);
+          },
+          onload: () => {
+            data._duration = data._instance.duration();
+          },
+          onseek: () => {
+            this.log("On Seek");
+            this._onSeek();
+          },
+          onloaderror: () => {
+            this.log(`Unable to load resource ${data.source}`);
+          },
+          onend: () => {
+            this._onEnd();
+          }
+        });
+      }
+      this.log(`Playing ${data.title} on index ${index}`);
+      data._instance.play();
+      this._index = index;
     }
-    data._instance.play();
-    this._index = index;
   }
 
   pause() {
-    const instance = this.getSong()._instance;
-    if (instance) instance.pause();
+    const data = this.getSong();
+    if (data && data._instance) data._instance.pause();
   }
 
   volume(volume) {
-    console.log(`Volume set to ${volume}`);
+    this.log(`Volume set to ${volume}`);
     Howler.volume(volume);
   }
 
   mute(isMute) {
+    this.log(`Mute: ${isMute}`);
     Howler.mute(isMute);
   }
 
   skipTo(index) {
-    const instance = this.getSong()._instance;
-    console.log(`Stop: ${this.getSong().title}`);
-    if (instance) instance.stop();
+    const data = this.getSong();
+    if (data && data._instance) {
+      this.log(`Stop: ${this.getSong().title}`);
+      data._instance.stop();
+    }
     this.play(index);
   }
 
@@ -63,47 +80,51 @@ export default class Player {
       if (index >= this._list.length) index = 0;
     } else {
       index = this._index - 1;
-      if (index < 0) index = this._list.length - 1;
+      if (index < 0) index = Math.max(this._list.length - 1, 0);
     }
-    console.log(index);
-    console.log(this._list);
     this.skipTo(index);
   }
   seek(percent) {
-    const instance = this.getSong()._instance;
-    if (instance) {
-      instance.seek(percent / 100 * instance.duration());
+    this.log(`Seek to ${percent}`);
+    const data = this.getSong();
+    if (data && data._instance) {
+      data._instance.seek(percent / 100 * data._duration);
     }
   }
   progress() {
-    const instance = this.getSong()._instance;
-    if (instance) {
-      return (instance.seek() / instance.duration() * 100);
+    const data = this.getSong();
+    if (data && data._instance) {
+      let time = Number(data._instance.seek());
+      if (isNaN(time)) {
+        time = data._instance._sounds[0]._seek;
+      }
+      const duration = data._duration;
+      return time / duration * 100;
     }
+    return 0;
   }
-  // Getter
-  getCurrentSong() {
-    return this._currentSong;
-  }
-
+  // Methods to get informaiont
   getSong(index) {
     if (typeof index !== "number") index = this._index;
     return this._list[index];
   }
 
   isPlaying() {
-    const instance = this.getSong()._instance;
-    if (instance) {
-      return instance.playing();
+    const data = this.getSong();
+    if (data && data._instance) {
+      return data._instance.playing();
     }
     return false;
   }
   duration() {
-    const instance = this.getSong()._instance;
-    if (instance) {
-      return instance.duration();
+    const data = this.getSong();
+    if (data && data._instance) {
+      return data._duration;
     }
     return 0;
+  }
+  log(msg) {
+    console.log(`Player: ${msg}`);
   }
 };
 

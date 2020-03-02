@@ -28,6 +28,8 @@
     <button @click="skip(-1)">Prev</button>
 
     <button @click="skip(1)">Next</button>
+    Autoplay
+    <input type="checkbox" value="true" v-model="autoPlay" />
   </div>
 </template>
 
@@ -45,21 +47,19 @@ export default {
   },
   data: function() {
     return {
-      volume: 10,
+      volume: 1,
       player: new Player([]),
       duration: 0,
-      progress: 20,
+      progress: 0,
       title: "",
       isPlaying: false,
-      isMute: false
+      isMute: false,
+      autoPlay: [true]
     };
   },
   methods: {
     seek: function(clickPercent) {
-      console.log("Seeked");
-      this.progress = clickPercent;
       this.player.seek(clickPercent);
-      this.step();
     },
     onChangeVolume: function(newValue) {
       newValue = Math.round(newValue);
@@ -67,7 +67,6 @@ export default {
       this.player.volume(newValue / 100);
     },
     play() {
-      this.player.bindEvent(this.onPlay.bind(this), this.onSeek.bind(this));
       this.player.play();
     },
     pause() {
@@ -79,16 +78,16 @@ export default {
     },
     step() {
       const isPlaying = this.player.isPlaying();
-      this.progress = this.player.progress();
-      // console.log(`Currently Playing: ${this.getSong()._source}`);
-      if (isPlaying) requestAnimationFrame(this.step.bind(this));
+      if (isPlaying) {
+        this.progress = this.player.progress();
+        requestAnimationFrame(this.step.bind(this));
+      }
     },
     mute() {
       this.isMute = !this.isMute;
       this.player.mute(this.isMute);
     },
     onPlay(title, duration) {
-      console.log("On Play Triggered");
       this.title = title;
       this.duration = duration;
       this.player.volume(this.volume / 100);
@@ -99,6 +98,10 @@ export default {
       this.progress = this.player.progress();
       this.step();
     },
+    onEnd() {
+      this.isPlaying = false;
+      if (this.autoPlay.length > 0) this.skip(true);
+    },
     loadSongList() {
       console.log("Loading List");
       this.axios
@@ -108,6 +111,11 @@ export default {
             const data = response.data;
             console.log(data);
             this.player = new Player(data);
+            this.player.bindEvent(
+              this.onPlay.bind(this),
+              this.onSeek.bind(this),
+              this.onEnd.bind(this)
+            );
           });
         })
         .catch(err => {
@@ -139,6 +147,9 @@ export default {
   },
   beforeMount() {
     this.loadSongList();
+  },
+  errorCaptured(err, vm, info) {
+    alert(err);
   }
 };
 </script>
