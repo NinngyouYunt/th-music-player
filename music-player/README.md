@@ -26,7 +26,8 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### To-do
 - Auto next
-- Next/prev
 - Volume 0
-- Mute
 - Display song info
+- Display list
+- Error when load a song failed
+- Error when load list failed

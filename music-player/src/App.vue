@@ -46,7 +46,7 @@ export default {
   data: function() {
     return {
       volume: 10,
-      player: null,
+      player: new Player([]),
       duration: 0,
       progress: 20,
       title: "",
@@ -98,6 +98,22 @@ export default {
     onSeek() {
       this.progress = this.player.progress();
       this.step();
+    },
+    loadSongList() {
+      console.log("Loading List");
+      this.axios
+        .get(cfg.url)
+        .then(res => {
+          this.axios.get(cfg.url + cfg.path).then(response => {
+            const data = response.data;
+            console.log(data);
+            this.player = new Player(data);
+          });
+        })
+        .catch(err => {
+          console.log(`Service is not running ${err}, retry in 5 seconds`);
+          setTimeout(this.loadSongList.bind(this), 5000);
+        });
     }
   },
   computed: {
@@ -122,18 +138,7 @@ export default {
     }
   },
   beforeMount() {
-    this.axios
-      .get(cfg.url)
-      .catch(err => {
-        console.log(`Service is not running ${err}`);
-      })
-      .then(res => {
-        this.axios.get(cfg.url + cfg.path).then(response => {
-          const data = response.data;
-          console.log(data);
-          this.player = new Player(data);
-        });
-      });
+    this.loadSongList();
   }
 };
 </script>
