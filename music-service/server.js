@@ -5,7 +5,7 @@ const app = require("./app");
 // Customize Error Handler - This is where you could put local log file for any errors that happen
 app.use(function (err, req, res, next) {
   const requestInfo = {
-    url: req.protocol + '://' + req.get('host') + req.originalUrl,
+    url: `${req.protocol}://${req.get("host")}${req.originalUrl}`,
     method: req.method
   };
   // Deal with 404 error

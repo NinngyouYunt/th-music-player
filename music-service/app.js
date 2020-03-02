@@ -1,6 +1,6 @@
 const express = require("express");
 const logger = require("morgan");
-const createError = require('http-errors');
+const createError = require("http-errors");
 const cors = require("cors");
 
 const cfg = require("./config/config.js");
