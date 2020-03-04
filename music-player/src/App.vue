@@ -57,13 +57,9 @@ export default {
     };
   },
   methods: {
+    // Player Functionality
     seek: function(clickPercent) {
       this.player.seek(clickPercent);
-    },
-    onChangeVolume: function(newValue) {
-      newValue = Math.round(newValue);
-      this.volume = newValue;
-      this.player.volume(newValue / 100);
     },
     play() {
       this.player.play();
@@ -86,6 +82,16 @@ export default {
       this.isMute = !this.isMute;
       this.player.mute(this.isMute);
     },
+    // Http Listener
+    onCloseNotification(index) {
+      this.notifications.splice(index);
+    },
+    onChangeVolume: function(newValue) {
+      newValue = Math.round(newValue);
+      this.volume = newValue;
+      this.player.volume(newValue / 100);
+    },
+    // Player Listener
     onPlay(title, duration) {
       this.title = title;
       this.duration = duration;
@@ -101,9 +107,7 @@ export default {
       this.isPlaying = false;
       if (this.autoPlay.length > 0) this.skip(true);
     },
-    onCloseNotification(index) {
-      this.notifications.splice(index);
-    },
+    // Util
     errorHandler(error) {
       console.log(error);
       this.notifications.push(error);
