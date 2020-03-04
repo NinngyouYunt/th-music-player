@@ -1,5 +1,5 @@
 <template>
-  <div class="volumeControlContainer" :style="containerStyle">
+  <div class="volume-control-container" :class="{vertical: vertical}" :style="containerStyle">
     <input
       type="range"
       min="0"
@@ -27,6 +27,10 @@ export default {
     initialVolume: {
       type: Number,
       default: 50
+    },
+    vertical: {
+      type: Boolean,
+      default: false
     }
   },
   data: function() {
@@ -63,6 +67,11 @@ export default {
 </script>
 
 <style scoped>
+.vertical {
+  transform: rotate(270deg);
+  -moz-transform: rotate(270deg);
+}
+
 .slider {
   appearance: none;
   width: 100%;
