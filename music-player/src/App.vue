@@ -124,16 +124,15 @@ export default {
     },
     // Util
     errorHandler(error) {
-      console.log(error);
+      this.log(0, error);
       this.notifications.push(error);
     },
     loadSongList() {
-      console.log("Loading List");
+      this.log(1, "Loading List");
       this.axios
         .get(cfg.url + cfg.path)
         .then(response => {
           const data = response.data;
-          console.log(data);
           this.player = new Player(data);
           this.player.bindEvent(
             this.onPlay.bind(this),
@@ -143,9 +142,12 @@ export default {
         })
         .catch(err => {
           this.errorHandler("Service is not running");
-          console.log(err);
+          this.log(0, err);
           setTimeout(this.loadSongList.bind(this), 5000);
         });
+    },
+    log(type, msg) {
+      console.log(msg);
     }
   },
   computed: {
