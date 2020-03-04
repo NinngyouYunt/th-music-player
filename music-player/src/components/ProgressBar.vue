@@ -45,9 +45,6 @@ export default {
   computed: {
     foregroundWidth: function() {
       return `${this.progress}%`;
-    },
-    sliderPosition: function() {
-      return "0";
     }
   }
 };

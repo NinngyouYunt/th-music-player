@@ -19,14 +19,9 @@
       @changeVolume="onChangeVolume"
     />
     <br />
-    <progress-bar width="10rem" height="7px" :progress="volume" @jump="onChangeVolume" />
-    <br />
     <button v-if="!isPlaying" @click="play">Play</button>
-
     <button v-if="isPlaying" @click="pause">Pause</button>
-
     <button @click="skip(-1)">Prev</button>
-
     <button @click="skip(1)">Next</button>
     Autoplay
     <input type="checkbox" value="true" v-model="autoPlay" />

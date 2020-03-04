@@ -2,9 +2,8 @@
   <div class="volumeControlContainer" :style="containerStyle">
     <input
       type="range"
-      min="1"
+      min="0"
       max="100"
-      value="0"
       class="slider"
       id="volume"
       v-model="volume"
