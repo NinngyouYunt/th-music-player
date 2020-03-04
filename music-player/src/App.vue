@@ -40,7 +40,24 @@
       Autoplay
       <input type="checkbox" value="true" v-model="autoPlay" />
     </div>
-    <notification :messages="notifications" :lifeSpan="100000" @close="onCloseNotification" />
+
+    <div class="play-list-div">
+      <ul>
+        <li v-for="(song, index) in playlist" :key="song.title">
+          <a @click="skipTo(index)" class="play-list-item">
+            {{index}}:
+            Title: {{song.title}}
+            <br />
+            Album: {{song.album}}
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <button @click="errorHandler('random')">Add Notification</button>
+    </div>
+    <notification :messages="notifications" @close="onCloseNotification" />
   </div>
 </template>
 
@@ -68,7 +85,8 @@ export default {
       isPlaying: false,
       isMute: false,
       autoPlay: [true],
-      notifications: []
+      notifications: [],
+      playlist: []
     };
   },
   methods: {
@@ -99,7 +117,7 @@ export default {
     },
     // Http Listener
     onCloseNotification(index) {
-      this.notifications.splice(index);
+      this.notifications.splice(index, 1);
     },
     onChangeVolume: function(newValue) {
       newValue = Math.round(newValue);
@@ -125,7 +143,7 @@ export default {
     // Util
     errorHandler(error) {
       this.log(0, error);
-      this.notifications.push(error);
+      this.notifications.push({ content: error, time: new Date().toJSON() });
     },
     loadSongList() {
       this.log(1, "Loading List");
@@ -134,6 +152,7 @@ export default {
         .then(response => {
           const data = response.data;
           this.player = new Player(data);
+          this.playlist = data;
           this.player.bindEvent(
             this.onPlay.bind(this),
             this.onSeek.bind(this),
@@ -141,7 +160,7 @@ export default {
           );
         })
         .catch(err => {
-          this.errorHandler("Service is not running" + (new Date()).getSeconds());
+          this.errorHandler("Service is not running ");
           this.log(0, err);
           setTimeout(this.loadSongList.bind(this), 5000);
         });

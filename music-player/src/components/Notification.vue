@@ -4,43 +4,36 @@
       class="notification-box"
       @click="close(index)"
       v-for="(message, index) in messages"
-      :key="index"
-    >
-      <div>{{message}}</div>
-    </div>
+      :key="message.time"
+    >{{message.content}}</div>
   </div>
 </template>
 
 <script>
 export default {
   data: function() {
-    return { timeouts: [] };
+    return {};
   },
   props: {
     messages: {
       type: Array,
-      default: () => ["Default Message 1", "Default Message 2"]
+      default: () => []
     },
-    lifeSpan: {
+    maxLimit: {
       type: Number,
-      default: 5000
+      default: 5
     }
   },
   methods: {
     close: function(index) {
-      window.clearTimeout(this.timeouts[index]);
-      this.timeouts.splice(index);
       this.$emit("close", index);
     }
   },
   watch: {
     messages: function() {
-      const index = this.messages.length - 1;
-      this.timeouts.push(
-        window.setTimeout(() => {
-          this.close(index);
-        }, this.lifeSpan)
-      );
+      if (this.messages.length > this.maxLimit) {
+        this.$emit("close", 0);
+      }
     }
   }
 };
@@ -53,7 +46,7 @@ export default {
 }
 .notification-box {
   background-color: pink;
-  width: 15rem;
+  width: auto;
   height: 3rem;
   line-height: 3rem;
   font-size: 1rem;
