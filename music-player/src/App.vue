@@ -25,12 +25,14 @@
     <button @click="skip(1)">Next</button>
     Autoplay
     <input type="checkbox" value="true" v-model="autoPlay" />
+    <notification :messages="notifications" :lifeSpan="10000" @close="onCloseNotification" />
   </div>
 </template>
 
 <script>
 import ProgressBar from "./components/ProgressBar.vue";
 import VolumeControl from "./components/VolumeControl.vue";
+import Notification from "./components/Notification.vue";
 import Player from "./lib/Player.js";
 import cfg from "./config/config.js";
 
@@ -38,7 +40,8 @@ export default {
   name: "App",
   components: {
     ProgressBar,
-    VolumeControl
+    VolumeControl,
+    Notification
   },
   data: function() {
     return {
@@ -49,7 +52,8 @@ export default {
       title: "",
       isPlaying: false,
       isMute: false,
-      autoPlay: [true]
+      autoPlay: [true],
+      notifications: []
     };
   },
   methods: {
@@ -97,24 +101,30 @@ export default {
       this.isPlaying = false;
       if (this.autoPlay.length > 0) this.skip(true);
     },
+    onCloseNotification(index) {
+      this.notifications.splice(index);
+    },
+    errorHandler(error) {
+      console.log(error);
+      this.notifications.push(error);
+    },
     loadSongList() {
       console.log("Loading List");
       this.axios
-        .get(cfg.url)
-        .then(res => {
-          this.axios.get(cfg.url + cfg.path).then(response => {
-            const data = response.data;
-            console.log(data);
-            this.player = new Player(data);
-            this.player.bindEvent(
-              this.onPlay.bind(this),
-              this.onSeek.bind(this),
-              this.onEnd.bind(this)
-            );
-          });
+        .get(cfg.url + cfg.path)
+        .then(response => {
+          const data = response.data;
+          console.log(data);
+          this.player = new Player(data);
+          this.player.bindEvent(
+            this.onPlay.bind(this),
+            this.onSeek.bind(this),
+            this.onEnd.bind(this)
+          );
         })
         .catch(err => {
-          console.log(`Service is not running ${err}, retry in 5 seconds`);
+          this.errorHandler("Service is not running");
+          console.log(err);
           setTimeout(this.loadSongList.bind(this), 5000);
         });
     }
