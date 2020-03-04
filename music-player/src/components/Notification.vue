@@ -35,8 +35,6 @@ export default {
   },
   watch: {
     messages: function() {
-      console.log(this.messages.length);
-      console.log(this.timeouts.length);
       const index = this.messages.length - 1;
       this.timeouts.push(
         window.setTimeout(() => {

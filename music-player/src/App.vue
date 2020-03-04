@@ -1,30 +1,45 @@
 <template>
   <div id="app">
-    <h3>Currently Playing: {{title}}</h3>
-    <p>Progress: {{musicProgress}}%</p>
-    <p>Duration: {{formattedPlayed}}/{{formattedDuration}}</p>
-    <progress-bar width="40rem" height="10px" :progress="progress" @jump="seek" />
+    <div class="song-info-div">
+      <h3>Currently Playing: {{title}}</h3>
+      <p>Progress: {{musicProgress}}%</p>
+      <p>Duration: {{formattedPlayed}}/{{formattedDuration}}</p>
+    </div>
 
     <br />
-    <p>Volume: {{volume}}</p>
-    <button @click="mute">
-      <span v-if="!isMute">Mute</span>
-      <span v-if="isMute">Unmute</span>
-    </button>
-    <volume-control
-      width="10rem"
-      height="7px"
-      :initialVolume="volume"
-      v-once
-      @changeVolume="onChangeVolume"
-    />
+
+    <div class="progress-bar-div">
+      <progress-bar width="40rem" height="10px" :progress="progress" @jump="seek" />
+    </div>
+
     <br />
-    <button v-if="!isPlaying" @click="play">Play</button>
-    <button v-if="isPlaying" @click="pause">Pause</button>
-    <button @click="skip(-1)">Prev</button>
-    <button @click="skip(1)">Next</button>
-    Autoplay
-    <input type="checkbox" value="true" v-model="autoPlay" />
+
+    <div class="volume-control-div">
+      <p>Volume: {{volume}}</p>
+      <button @click="mute">
+        <span v-if="!isMute">Mute</span>
+        <span v-if="isMute">Unmute</span>
+      </button>
+
+      <volume-control
+        width="10rem"
+        height="7px"
+        :initialVolume="volume"
+        v-once
+        @changeVolume="onChangeVolume"
+      />
+    </div>
+
+    <br />
+
+    <div class="player-control-div">
+      <button v-if="!isPlaying" @click="play">Play</button>
+      <button v-if="isPlaying" @click="pause">Pause</button>
+      <button @click="skip(-1)">Prev</button>
+      <button @click="skip(1)">Next</button>
+      Autoplay
+      <input type="checkbox" value="true" v-model="autoPlay" />
+    </div>
     <notification :messages="notifications" :lifeSpan="10000" @close="onCloseNotification" />
   </div>
 </template>
@@ -164,4 +179,7 @@ export default {
 </script>
 
 <style>
+#app {
+  display: block;
+}
 </style>
