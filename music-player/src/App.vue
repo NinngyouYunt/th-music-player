@@ -40,7 +40,7 @@
       Autoplay
       <input type="checkbox" value="true" v-model="autoPlay" />
     </div>
-    <notification :messages="notifications" :lifeSpan="10000" @close="onCloseNotification" />
+    <notification :messages="notifications" :lifeSpan="100000" @close="onCloseNotification" />
   </div>
 </template>
 
@@ -141,7 +141,7 @@ export default {
           );
         })
         .catch(err => {
-          this.errorHandler("Service is not running");
+          this.errorHandler("Service is not running" + (new Date()).getSeconds());
           this.log(0, err);
           setTimeout(this.loadSongList.bind(this), 5000);
         });
