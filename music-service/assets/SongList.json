@@ -1,12 +1,5 @@
 [
   {
-    "name": "ungroup",
-    "albumId": 0,
-    "list": [
-      "Random SoundTrack"
-    ]
-  },
-  {
     "name": "th06",
     "albumId": 6,
     "list": [
@@ -27,32 +20,6 @@
       "U.N.オーエンは彼女なのか？",
       "紅より儚い永遠",
       "紅楼　～ Eastern Dream..."
-    ]
-  },
-  {
-    "name": "th07",
-    "albumId": 7,
-    "list": [
-      "妖々夢　～ Snow or Cherry Petal",
-      "無何有の郷　～ Deep Mountain",
-      "クリスタライズシルバー",
-      "遠野幻想物語",
-      "ティアオイエツォン(withered leaf)",
-      "ブクレシュティの人形師",
-      "人形裁判　～ 人の形弄びし少女",
-      "天空の花の都",
-      "幽霊楽団　～ Phantom Ensemble",
-      "東方妖々夢　～ Ancient Temple",
-      "広有射怪鳥事　～ Till When_",
-      "アルティメットトゥルース",
-      "幽雅に咲かせ、墨染の桜　～ Border of Life",
-      "ボーダーオブライフ",
-      "妖々跋扈",
-      "少女幻葬　～ Necro-Fantasy",
-      "妖々跋扈　～ Who done it!",
-      "ネクロファンタジア",
-      "春風の夢",
-      "さくらさくら　～ Japanize Dream...",
     ]
   }
 ]

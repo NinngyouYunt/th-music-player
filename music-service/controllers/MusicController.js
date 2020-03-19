@@ -43,7 +43,7 @@ class MusicController {
     albumId = this.prependZero(albumId);
     songId = this.prependZero(songId);
     const folderName = `th${albumId}`;
-    const fileName = `${songId}.mp3`;
+    const fileName = `${songId}.ogg`;
     return path.join(__dirname, this.assetsFolder, folderName, fileName);
   }
   prependZero(value) {
