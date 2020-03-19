@@ -2,7 +2,7 @@
   <div id="app">
     <div class="song-info-div">
       <h3>Currently Playing: {{title}}</h3>
-      <p>Progress: {{musicProgress}}%</p>
+      <p>Progress: {{progress}}%</p>
       <p>Duration: {{formattedPlayed}}/{{formattedDuration}}</p>
     </div>
 
@@ -77,10 +77,8 @@ export default {
   },
   data: function() {
     return {
-      volume: 1,
       player: new Player([]),
       duration: 0,
-      progress: 0,
       title: "",
       isPlaying: false,
       isMute: false,
@@ -105,9 +103,8 @@ export default {
       this.player.skip(forward === 1);
     },
     step() {
-      const isPlaying = this.player.isPlaying();
-      if (isPlaying) {
-        this.progress = this.player.progress();
+      if (this.isPlaying) {
+        this.$store.commit("setProgress", this.player.progress());
         requestAnimationFrame(this.step.bind(this));
       }
     },
@@ -121,7 +118,7 @@ export default {
     },
     onChangeVolume: function(newValue) {
       newValue = Math.round(newValue);
-      this.volume = newValue;
+      this.$store.commit("setVolume", newValue);
       this.player.volume(newValue / 100);
     },
     // Player Listener
@@ -133,7 +130,8 @@ export default {
       this.step();
     },
     onSeek() {
-      this.progress = this.player.progress();
+      this.log(null, "onSeek");
+      this.$store.commit("setProgress", this.player.progress());
       this.step();
     },
     onEnd() {
@@ -170,8 +168,11 @@ export default {
     }
   },
   computed: {
-    musicProgress() {
-      return this.progress;
+    progress() {
+      return this.$store.state.musicStore.progress;
+    },
+    volume() {
+      return this.$store.state.musicStore.volume;
     },
     formattedDuration() {
       const total = this.duration;
@@ -182,7 +183,7 @@ export default {
       }${second}`;
     },
     formattedPlayed() {
-      const total = (this.musicProgress / 100) * this.duration;
+      const total = (this.progress / 100) * this.duration;
       const minute = Math.floor(total / 60);
       const second = Math.round(total - minute * 60);
       return `${minute < 10 ? 0 : ""}${minute}:${

@@ -7,6 +7,8 @@
 </template>
 
 <script>
+// The parent using this bar is responsible for updating the progress if needed
+// The parent can listent to user clicking on the bar by listening to event "jump"
 export default {
   name: "ProgressBar",
   data: function() {

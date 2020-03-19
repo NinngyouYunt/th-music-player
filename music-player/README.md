@@ -36,4 +36,8 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 - Collapse/Expand play list
 
 ### Bug
+
+### Resolved
 - When skip to certain time, the progress bar freeze (inconsistent, reason unknown)
+  - When onseek -> step is called, player.isPlaying() is false sometimes
+  - Fixed by using this.isPlaying in step
