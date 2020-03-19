@@ -42,14 +42,9 @@
     </div>
 
     <div class="play-list-div">
-      <ul>
+      <ul class="list">
         <li v-for="(song, index) in playlist" :key="song.title">
-          <a @click="skipTo(index)" class="play-list-item">
-            {{index}}:
-            Title: {{song.title}}
-            <br />
-            Album: {{song.album}}
-          </a>
+          <a @click="skipTo(index)" class="play-list-item">{{song.title}}</a>
         </li>
       </ul>
     </div>
@@ -111,6 +106,9 @@ export default {
     mute() {
       this.isMute = !this.isMute;
       this.player.mute(this.isMute);
+    },
+    skipTo(index) {
+      this.player.skipTo(index);
     },
     // Http Listener
     onCloseNotification(index) {
@@ -203,5 +201,13 @@ export default {
 <style>
 #app {
   display: block;
+}
+.list {
+  font-size: 10px;
+  list-style-type: none;
+}
+.play-list-item:hover {
+  background: grey;
+  cursor: pointer;
 }
 </style>
