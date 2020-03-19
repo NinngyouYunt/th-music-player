@@ -5,7 +5,7 @@ const MusicDal = require("../dal/MusicDal.js");
 
 class MusicController {
   constructor() {
-    this.folderToFile = "../assets/";
+    this.assetsFolder = "../assets/";
     this._dal = new MusicDal();
   }
 
@@ -42,8 +42,9 @@ class MusicController {
   createFilePath(albumId, songId) {
     albumId = this.prependZero(albumId);
     songId = this.prependZero(songId);
-    const fileName = `th${albumId}_${songId}.mp3`;
-    return path.join(__dirname, this.folderToFile, fileName);
+    const folderName = `th${albumId}`;
+    const fileName = `${songId}.mp3`;
+    return path.join(__dirname, this.assetsFolder, folderName, fileName);
   }
   prependZero(value) {
     if (typeof value == "string") {
