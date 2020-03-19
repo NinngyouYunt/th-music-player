@@ -100,3 +100,4 @@ config.json
 package-lock.json
 
 assets/temp
+*.mp3
